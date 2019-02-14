@@ -6,7 +6,7 @@ class Thumbkiss {
     this.groups = new Map();
     this.server = server;
 
-    wss.on('connection', function connection(ws, req) {
+    this.server.on('connection', (ws, req) => {
       const id = req.headers['x-id'];
       const group = req.headers['x-group'];
       this.handleNewConnection(ws, group, id);

@@ -5,16 +5,17 @@ class Group {
     this.name = name;
   }
 
-  handleNewClient(clientId, client) {
+  handleNewClient(client, clientId) {
     if (this.clients.size >= 2) {
       return;
     }
 
     this.clients.set(clientId, client);
-    ws.on('message', function incoming(message) {
+    client.on('message', function incoming(message) {
       console.log('received: %s', message);
     });
-    ws.send('something');
+    client.send('something');
+    client.close();
   }
 }
 

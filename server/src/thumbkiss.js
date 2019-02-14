@@ -9,6 +9,7 @@ class Thumbkiss {
     this.server.on('connection', (ws, req) => {
       const id = req.headers['x-id'];
       const group = req.headers['x-group'];
+      if (id == undefined || group == undefined) return;
       this.handleNewConnection(ws, group, id);
     });
   }

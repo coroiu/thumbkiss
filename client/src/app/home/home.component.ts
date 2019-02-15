@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.identity = this.identityService.identity;
     this.route.paramMap
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(paramMap => this.applicationService.remoteId = paramMap.get('remoteId'));
+      .subscribe(paramMap => this.applicationService.groupId = paramMap.get('groupId'));
   }
 
   get connectionState() {
@@ -40,8 +40,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  get remoteId() {
-    return this.applicationService.remoteId;
+  get groupId() {
+    return this.applicationService.groupId;
   }
 
   ngOnDestroy(): void {

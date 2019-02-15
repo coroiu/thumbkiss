@@ -1,8 +1,8 @@
 class Group {
-  constructor(server, name) {
+  constructor(id, server) {
     this.clients = new Map();
     this.server = server;
-    this.name = name;
+    this.id = id;
   }
 
   handleNewClient(client, clientId) {
@@ -14,7 +14,7 @@ class Group {
     client.on('message', function incoming(message) {
       console.log('received: %s', message);
     });
-    client.send('something');
+    client.send(`groupId: ${this.id}, clientId: ${clientId}`);
     client.close();
   }
 }

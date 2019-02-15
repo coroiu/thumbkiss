@@ -7,24 +7,26 @@ class Thumbkiss {
     this.server = server;
 
     this.server.on('connection', (ws, req) => {
-      const id = req.headers['x-id'];
-      const group = req.headers['x-group'];
-      if (id == undefined || group == undefined) return;
-      this.handleNewConnection(ws, group, id);
+      const params = new URL(`http://fakehost${req.url}`).searchParams;
+      const clientId = params.get('clientId');
+      const groupId = params.get('groupId');
+      if (clientId == undefined || groupId == undefined) return;
+      this.handleNewConnection(ws, groupId, clientId);
     });
   }
 
-  handleNewConnection(client, groupName, clientId) {
-    const group = this.getOrCreateGroup(groupName);
+  handleNewConnection(client, groupId, clientId) {
+    console.log(`New connection received with groupId: ${groupId}, clientId: '${clientId}'`);
+    const group = this.getOrCreateGroup(groupId);
     group.handleNewClient(client, clientId);
   }
 
-  getOrCreateGroup(groupName) {
-    if (this.groups.has(groupName)) {
-      return this.groups.get(groupName);
+  getOrCreateGroup(groupId) {
+    if (this.groups.has(groupId)) {
+      return this.groups.get(groupId);
     }
-    const group = new Group(this.server, groupName);
-    this.groups.set(groupName, group);
+    const group = new Group(groupId, this.server);
+    this.groups.set(groupId, group);
     return group;
   }
 }

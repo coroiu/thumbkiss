@@ -1,7 +1,6 @@
 import { EventEmitter } from '@angular/core';
 
 export interface IConnection {
-  readonly remoteId: string;
   readonly onConnectionLost: EventEmitter<void>;
   readonly onConnectionClosed: EventEmitter<void>;
   readonly onDataReceived: EventEmitter<any>;

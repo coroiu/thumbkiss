@@ -1,33 +1,34 @@
 import { Injectable } from '@angular/core';
 import { IdentityService } from '../identity/identity.service';
-import { NetworkConnection } from '../network/network-connection';
+import { WebsocketConnection } from '../network/websocket-connection';
+import { ConnectionState } from '../network/connection-state';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApplicationService {
-  private networkConnection: NetworkConnection;
+  private connection: WebsocketConnection;
   private _remoteId: string;
 
   constructor(
     private identityService: IdentityService
   ) {
-    this.networkConnection = new NetworkConnection(identityService.identity.id);
-    this.networkConnection.onDataReceived.subscribe(data => console.log('wat:', data));
+    this.connection = new WebsocketConnection(identityService.identity.id);
+    this.connection.onDataReceived.subscribe(data => console.log('data:', data));
   }
 
-  get remoteId() {
+  get groupId() {
     return this._remoteId;
   }
 
-  set remoteId(value: string) {
+  set groupId(value: string) {
     this._remoteId = value;
     if (value !== undefined && value !== null) {
-      this.networkConnection.connect(value);
+      this.connection.connect(value);
     }
   }
 
   get connectionState() {
-    return this.networkConnection.connectionState;
+    return ConnectionState.Disconnected;
   }
 }

@@ -17,13 +17,33 @@ export class WebsocketConnection implements IConnection {
   connect(groupId: string) {
     console.log('connecting');
     this.socket = new WebSocket(`ws://${location.host}?clientId=${this.id}&groupId=${groupId}`);
+    this.socket.onopen = this.openHandler.bind(this);
+    this.socket.onmessage = this.messageHandler.bind(this);
+    this.socket.onclose = this.closeHandler.bind(this);
+    this.socket.onerror = this.errorHandler.bind(this);
   }
 
   send(data: any) {
-    throw new Error('Method not implemented.');
+    this.socket.send(data);
   }
 
   disconnect() {
-    throw new Error('Method not implemented.');
+    this.socket.close();
+    this.socket = undefined;
+  }
+
+  private openHandler(event: Event) {
+  }
+
+  private messageHandler(event: MessageEvent) {
+    this.onDataReceived.emit(event.data);
+  }
+
+  private closeHandler(event: CloseEvent) {
+    this.onConnectionClosed.emit();
+  }
+
+  private errorHandler(event: Event) {
+
   }
 }

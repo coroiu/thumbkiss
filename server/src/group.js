@@ -16,8 +16,17 @@ class Group {
     }
 
     this.clients.set(clientId, client);
-    client.on('message', function incoming(message) {
+    client.on('message', (message) => {
       console.log('received: %s', message);
+      this.clients.forEach((client, key) => {
+        if (key !== clientId) {
+          client.send(message);
+        }
+      })
+    });
+
+    client.on('close', () => {
+      this.clients.delete(clientId);
     });
   }
 }

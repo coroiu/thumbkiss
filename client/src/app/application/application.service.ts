@@ -15,7 +15,6 @@ export class ApplicationService {
     private identityService: IdentityService
   ) {
     this.websocketConnection = new WebsocketConnection(identityService.identity.id);
-    this.websocketConnection.onDataReceived.subscribe(data => console.log('data:', data));
   }
 
   get groupId() {

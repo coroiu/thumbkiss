@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { FingerState } from '../finger-state';
 
 @Component({
   selector: 'app-finger',
@@ -6,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./finger.component.scss']
 })
 export class FingerComponent implements OnInit {
+  @Input() state: FingerState;
 
   constructor() { }
 

@@ -1,2 +1,1 @@
-<app-finger *ngFor='let in of counter(fingers.length); let i = index'
-[hidden]="!fingers[i].isTouching"></app-finger>
+<app-finger *ngFor='let in of counter(fingers.length); let i = index' [state]="fingers[i]"></app-finger>

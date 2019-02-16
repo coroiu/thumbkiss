@@ -1,10 +1,9 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { ApplicationService } from '../application/application.service';
 import { IConnection } from '../network/iconnection';
-import { TouchMoveMessage } from '../network/touch-move-message';
-import { TouchEndMessage } from '../network/touch-end-message';
-import { TouchStartMessage } from '../network/touch-start-message';
-import { FingerComponent } from './finger/finger.component';
+import { TouchMoveMessage, isTouchMoveMessage } from '../network/touch-move-message';
+import { TouchEndMessage, isTouchEndMessage } from '../network/touch-end-message';
+import { TouchStartMessage, isTouchStartMessage } from '../network/touch-start-message';
 import { FingerState } from './finger-state';
 
 @Component({
@@ -25,13 +24,36 @@ export class VirtualGlassComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.connection.onDataReceived.subscribe(message => {
+      if (isTouchStartMessage(message)) {
+        this.fingers[message.identifier] = {
+          isTouching: true,
+          x: message.x,
+          y: message.y
+        };
+      } else if (isTouchMoveMessage(message)) {
+        this.fingers[message.identifier] = {
+          isTouching: true,
+          x: message.x,
+          y: message.y
+        };
+      } else if (isTouchEndMessage(message)) {
+        this.fingers[message.identifier] = {
+          isTouching: false,
+          x: 0,
+          y: 0
+        };
+      }
+    });
   }
 
   @HostListener('touchstart', ['$event'])
   touchStart(event: TouchEvent) {
     this.connection.send<TouchStartMessage>({
       type: 'touchStart',
-      identifier: 0
+      identifier: 0,
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
     });
   }
 

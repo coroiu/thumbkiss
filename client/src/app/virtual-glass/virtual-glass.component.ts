@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ApplicationService } from '../application/application.service';
 import { IConnection } from '../network/iconnection';
 
@@ -17,4 +17,13 @@ export class VirtualGlassComponent implements OnInit {
   ngOnInit() {
   }
 
+  @HostListener('touchmove', ['$event'])
+  touchMove(event: TouchEvent) {
+    this.connection.send(JSON.stringify({
+      identifier: 0,
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
+    }));
+    console.log(event);
+  }
 }

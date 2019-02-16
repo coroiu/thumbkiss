@@ -6,6 +6,11 @@ class Group {
   }
 
   handleNewClient(client, clientId) {
+    if (this.clients.has(clientId)) {
+      this.clients.get(clientId).close();
+      this.clients.delete(clientId);
+    }
+
     if (this.clients.size >= 2) {
       return;
     }
@@ -15,7 +20,6 @@ class Group {
       console.log('received: %s', message);
     });
     client.send(`groupId: ${this.id}, clientId: ${clientId}`);
-    client.close();
   }
 }
 

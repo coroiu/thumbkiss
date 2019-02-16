@@ -1,11 +1,12 @@
 import { EventEmitter } from '@angular/core';
+import { Message } from './message';
 
 export interface IConnection {
   readonly onConnectionLost: EventEmitter<void>;
   readonly onConnectionClosed: EventEmitter<void>;
-  readonly onDataReceived: EventEmitter<any>;
+  readonly onDataReceived: EventEmitter<Message>;
   readonly onError: EventEmitter<any>;
 
-  send(data);
+  send<T extends Message>(data: T);
   disconnect();
 }

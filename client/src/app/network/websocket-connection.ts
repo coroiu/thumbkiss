@@ -1,5 +1,6 @@
 import { IConnection } from './iconnection';
 import { EventEmitter } from '@angular/core';
+import { Message } from './message';
 
 export class WebsocketConnection implements IConnection {
   public onConnectionLost = new EventEmitter<void>();
@@ -23,8 +24,8 @@ export class WebsocketConnection implements IConnection {
     this.socket.onerror = this.errorHandler.bind(this);
   }
 
-  send(data: any) {
-    this.socket.send(data);
+  send(data: Message) {
+    this.socket.send(JSON.stringify(data));
   }
 
   disconnect() {
@@ -36,7 +37,7 @@ export class WebsocketConnection implements IConnection {
   }
 
   private messageHandler(event: MessageEvent) {
-    this.onDataReceived.emit(event.data);
+    this.onDataReceived.emit(JSON.parse(event.data));
   }
 
   private closeHandler(event: CloseEvent) {

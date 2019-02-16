@@ -1,1 +1,4 @@
-<div class="finger" [hidden]="!state.isTouching"></div>
+<div class="finger" 
+  [hidden]="!state.isTouching"
+  [style.left.%]="state.x"
+  [style.top.%]="state.y"></div>

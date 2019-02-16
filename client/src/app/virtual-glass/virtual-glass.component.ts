@@ -52,8 +52,8 @@ export class VirtualGlassComponent implements OnInit {
     this.connection.send<TouchStartMessage>({
       type: 'touchStart',
       identifier: 0,
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY
+      x: (event.touches[0].clientX / document.documentElement.clientWidth) * 100,
+      y: (event.touches[0].clientY / document.documentElement.clientHeight) * 100
     });
   }
 
@@ -62,8 +62,8 @@ export class VirtualGlassComponent implements OnInit {
     this.connection.send<TouchMoveMessage>({
       type: 'touchMove',
       identifier: 0,
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY
+      x: (event.touches[0].clientX / document.documentElement.clientWidth) * 100,
+      y: (event.touches[0].clientY / document.documentElement.clientHeight) * 100
     });
   }
 

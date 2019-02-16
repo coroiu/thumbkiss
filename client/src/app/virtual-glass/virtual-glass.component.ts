@@ -4,6 +4,8 @@ import { IConnection } from '../network/iconnection';
 import { TouchMoveMessage } from '../network/touch-move-message';
 import { TouchEndMessage } from '../network/touch-end-message';
 import { TouchStartMessage } from '../network/touch-start-message';
+import { FingerComponent } from './finger/finger.component';
+import { FingerState } from './finger-state';
 
 @Component({
   selector: 'app-virtual-glass',
@@ -12,9 +14,14 @@ import { TouchStartMessage } from '../network/touch-start-message';
 })
 export class VirtualGlassComponent implements OnInit {
   private connection: IConnection;
+  private fingers: FingerState[];
 
   constructor(private application: ApplicationService) {
     this.connection = this.application.connection;
+    this.fingers = new Array(10);
+    for (let i = 0; i < this.fingers.length; ++i) {
+      this.fingers[i] = { isTouching: false, x: 0, y: 0 };
+    }
   }
 
   ngOnInit() {
@@ -44,5 +51,9 @@ export class VirtualGlassComponent implements OnInit {
       type: 'touchEnd',
       identifier: 0
     });
+  }
+
+  counter(i: number) {
+    return new Array(i);
   }
 }

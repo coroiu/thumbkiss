@@ -5,12 +5,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { VirtualGlassComponent } from './virtual-glass/virtual-glass.component';
+import { FingerComponent } from './virtual-glass/finger/finger.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    VirtualGlassComponent
+    VirtualGlassComponent,
+    FingerComponent
   ],
   imports: [
     BrowserModule,

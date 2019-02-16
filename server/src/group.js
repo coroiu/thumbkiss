@@ -19,7 +19,6 @@ class Group {
     client.on('message', function incoming(message) {
       console.log('received: %s', message);
     });
-    client.send(`groupId: ${this.id}, clientId: ${clientId}`);
   }
 }
 

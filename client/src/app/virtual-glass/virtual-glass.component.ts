@@ -49,29 +49,38 @@ export class VirtualGlassComponent implements OnInit {
 
   @HostListener('touchstart', ['$event'])
   touchStart(event: TouchEvent) {
-    this.connection.send<TouchStartMessage>({
-      type: 'touchStart',
-      identifier: 0,
-      x: (event.touches[0].clientX / document.documentElement.clientWidth) * 100,
-      y: (event.touches[0].clientY / document.documentElement.clientHeight) * 100
-    });
+    event.preventDefault();
+    this.touchChanged(event, 'touchStart');
   }
 
   @HostListener('touchmove', ['$event'])
   touchMove(event: TouchEvent) {
-    this.connection.send<TouchMoveMessage>({
-      type: 'touchMove',
-      identifier: 0,
-      x: (event.touches[0].clientX / document.documentElement.clientWidth) * 100,
-      y: (event.touches[0].clientY / document.documentElement.clientHeight) * 100
-    });
+    event.preventDefault();
+    this.touchChanged(event, 'touchMove');
+  }
+
+  touchChanged(event: TouchEvent, messageType: 'touchStart' | 'touchMove') {
+    const length = event.changedTouches.length;
+    let touch: Touch;
+    for (let i = 0; i < length; ++i) {
+      touch = event.changedTouches[i];
+      this.connection.send<any>({
+        type: messageType,
+        identifier: touch.identifier,
+        x: (touch.clientX / document.documentElement.clientWidth) * 100,
+        y: (touch.clientY / document.documentElement.clientHeight) * 100
+      });
+    }
   }
 
   @HostListener('touchend', ['$event'])
   touchEnd(event: TouchEvent) {
-    this.connection.send<TouchEndMessage>({
-      type: 'touchEnd',
-      identifier: 0
+    event.preventDefault();
+    Array.from(event.changedTouches).forEach(touch => {
+      this.connection.send<TouchEndMessage>({
+        type: 'touchEnd',
+        identifier: touch.identifier
+      });
     });
   }
 

@@ -42,8 +42,8 @@ export class VirtualGlassComponent implements OnInit {
           isTouching: true,
           x: message.x * document.documentElement.clientWidth,
           y: message.y * document.documentElement.clientHeight,
-          dx:  !oldState.isTouching ? 0 : message.x - oldState.x,
-          dy:  !oldState.isTouching ? 0 :  message.y - oldState.y,
+          dx: !oldState.isTouching ? 0 : message.x - oldState.x,
+          dy: !oldState.isTouching ? 0 : message.y - oldState.y,
           timestamp: Date.now()
         };
       } else if (isTouchEndMessage(message)) {
@@ -109,10 +109,12 @@ export class VirtualGlassComponent implements OnInit {
         identifier: touch.identifier
       });
 
-      this.localTouch.next({
+      const newUpdate = {
         identifier: touch.identifier,
         state: { isTouching: false, x: 0, y: 0, dx: 0, dy: 0, timestamp: Date.now() }
-      });
+      };
+      this.localFingers[touch.identifier] = newUpdate.state;
+      this.localTouch.next(newUpdate);
     });
   }
 

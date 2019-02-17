@@ -35,7 +35,7 @@ export class FogComponent implements OnInit {
       const newState = t.state;
       this.fingers[t.identifier] = newState;
 
-      if (!previousState.isTouching || !newState.isTouching) {
+      if (!previousState.isTouching || !newState.isTouching || (previousState.x === 0 && previousState.y === 0)) {
         return;
       }
 

@@ -74,11 +74,15 @@ export class VirtualGlassComponent implements OnInit {
     let touch: Touch;
     for (let i = 0; i < length; ++i) {
       touch = event.changedTouches[i];
+      const x = (touch.clientX / document.documentElement.clientWidth);
+      const y = (touch.clientY / document.documentElement.clientHeight);
       this.connection.send<any>({
-        type: messageType,
-        identifier: touch.identifier,
-        x: (touch.clientX / document.documentElement.clientWidth),
-        y: (touch.clientY / document.documentElement.clientHeight)
+        type: messageType, identifier: touch.identifier, x, y
+      });
+
+      this.localTouch.next({
+        identifier: i,
+        state: { isTouching: true, x, y }
       });
     }
   }
@@ -90,6 +94,11 @@ export class VirtualGlassComponent implements OnInit {
       this.connection.send<TouchEndMessage>({
         type: 'touchEnd',
         identifier: touch.identifier
+      });
+
+      this.localTouch.next({
+        identifier: touch.identifier,
+        state: { isTouching: false, x: 0, y: 0 }
       });
     });
   }

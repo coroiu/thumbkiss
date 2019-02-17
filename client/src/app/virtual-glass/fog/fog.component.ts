@@ -50,7 +50,7 @@ export class FogComponent implements OnInit {
     // Fog restoring observable
     const restoration = interval(100).pipe(
       takeUntil(this.touch),
-      take(50),
+      take(75),
       tap(() => {
         this.context.fillStyle = 'rgba(255, 255, 255, 0.05)';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -60,13 +60,14 @@ export class FogComponent implements OnInit {
     // Fog restoration
     this.touch.pipe(
       startWith({ identifier: undefined, state: undefined }),
-      debounceTime(5000),
+      debounceTime(7500),
       switchMap(() => restoration)
     ).subscribe();
   }
 
   private wipeFog(start: Point, end: Point) {
     this.context.globalCompositeOperation = 'destination-out';
+    this.context.fillStyle = '#000';
     this.context.strokeStyle = '#000';
     this.context.lineWidth = 25;
     this.context.beginPath();
@@ -74,6 +75,9 @@ export class FogComponent implements OnInit {
     this.context.lineTo(end.x, end.y);
     this.context.closePath();
     this.context.stroke();
+    this.context.arc(end.x, end.y, 12.5, 0, 2 * Math.PI);
+    this.context.closePath();
+    this.context.fill();
     this.context.globalCompositeOperation = 'source-over';
   }
 

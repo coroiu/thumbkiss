@@ -8,7 +8,7 @@
 
 .bg {
   @extend .fullscreen;
-  background-image: url(/assets/bg.jpg);
+  // background-image: url(/assets/bg.jpg);
   filter: blur(10px);
 }
 
@@ -28,6 +28,6 @@
 }
 
 app-fog {
-  filter: blur(3px);
-  // opacity: 0.5;
+  // filter: blur(px);
+  opacity: 0.6;
 }

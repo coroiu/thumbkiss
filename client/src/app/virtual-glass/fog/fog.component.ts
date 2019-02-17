@@ -32,12 +32,7 @@ export class FogComponent implements OnInit {
     this.fillCanvas();
     this.touch.subscribe(t => {
       const previousState = this.fingers[t.identifier];
-      const coordinates = this.convertToLocalCoordinates({ x: t.state.x, y: t.state.y });
-      const newState = {
-        ...t.state,
-        x: coordinates.x,
-        y: coordinates.y
-      };
+      const newState = t.state;
       this.fingers[t.identifier] = newState;
 
       if (!previousState.isTouching || !newState.isTouching) {
@@ -79,13 +74,6 @@ export class FogComponent implements OnInit {
     this.context.closePath();
     this.context.fill();
     this.context.globalCompositeOperation = 'source-over';
-  }
-
-  private convertToLocalCoordinates(point: Point): Point {
-    return {
-      x: point.x * this.canvas.clientWidth,
-      y: point.y * this.canvas.clientHeight
-    };
   }
 
   private fillCanvas() {

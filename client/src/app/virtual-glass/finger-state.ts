@@ -4,4 +4,5 @@ export interface FingerState {
   y: number;
   dx: number;
   dy: number;
+  timestamp: number;
 }

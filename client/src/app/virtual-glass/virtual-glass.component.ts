@@ -5,8 +5,7 @@ import { TouchMoveMessage, isTouchMoveMessage } from '../network/touch-move-mess
 import { TouchEndMessage, isTouchEndMessage } from '../network/touch-end-message';
 import { TouchStartMessage, isTouchStartMessage } from '../network/touch-start-message';
 import { FingerState } from './finger-state';
-import { Subject } from 'rxjs';
-import { SimpleFingerState } from './fog/finger-state';
+import { Subject, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-virtual-glass',
@@ -14,19 +13,21 @@ import { SimpleFingerState } from './fog/finger-state';
   styleUrls: ['./virtual-glass.component.scss']
 })
 export class VirtualGlassComponent implements OnInit {
+  public static readonly FINGER_SIZE = 20;
+
   private connection: IConnection;
   private localFingers: FingerState[];
   private remoteFingers: FingerState[];
-  private localTouch = new Subject<{ identifier: number, state: FingerState }>();
-  private remoteTouch = new Subject<{ identifier: number, state: FingerState }>();
+  private localTouch = new Subject<TouchUpdate>();
+  private remoteTouch = new Subject<TouchUpdate>();
 
   constructor(private application: ApplicationService) {
     this.connection = this.application.connection;
     this.localFingers = new Array(10);
     this.remoteFingers = new Array(10);
     for (let i = 0; i < this.remoteFingers.length; ++i) {
-      this.localFingers[i] = { isTouching: false,  x: 0, y: 0, dx: 0, dy: 0 };
-      this.remoteFingers[i] = { isTouching: false, x: 0, y: 0, dx: 0, dy: 0 };
+      this.localFingers[i] = { isTouching: false,  x: 0, y: 0, dx: 0, dy: 0, timestamp: Date.now() };
+      this.remoteFingers[i] = { isTouching: false, x: 0, y: 0, dx: 0, dy: 0, timestamp: Date.now() };
     }
   }
 
@@ -35,17 +36,18 @@ export class VirtualGlassComponent implements OnInit {
       const oldState = this.remoteFingers[message.identifier];
       let state: FingerState;
       if (isTouchStartMessage(message)) {
-        state = { isTouching: true, x: 0, y: 0, dx: 0, dy: 0 };
+        state = { isTouching: true, x: 0, y: 0, dx: 0, dy: 0, timestamp: Date.now() };
       } else if (isTouchMoveMessage(message)) {
         state = {
           isTouching: true,
-          x: message.x,
-          y: message.y,
-          dx: message.x - oldState.x,
-          dy: message.y - oldState.y,
+          x: message.x * document.documentElement.clientWidth,
+          y: message.y * document.documentElement.clientHeight,
+          dx:  !oldState.isTouching ? 0 : message.x - oldState.x,
+          dy:  !oldState.isTouching ? 0 :  message.y - oldState.y,
+          timestamp: Date.now()
         };
       } else if (isTouchEndMessage(message)) {
-        state = { isTouching: false, x: 0, y: 0, dx: 0, dy: 0 };
+        state = { isTouching: false, x: 0, y: 0, dx: 0, dy: 0, timestamp: Date.now() };
       }
 
       if (state !== undefined) {
@@ -53,6 +55,9 @@ export class VirtualGlassComponent implements OnInit {
         this.remoteTouch.next({ identifier: message.identifier, state });
       }
     });
+
+    this.detectTouches(this.localTouch, this.remoteFingers);
+    this.detectTouches(this.remoteTouch, this.localFingers);
   }
 
   @HostListener('touchstart', ['$event'])
@@ -79,17 +84,19 @@ export class VirtualGlassComponent implements OnInit {
       });
 
       const oldState = this.localFingers[touch.identifier];
-      this.localTouch.next({
+      const newUpdate = {
         identifier: touch.identifier,
         state: {
           isTouching: true,
-          x,
-          y,
-          dx: messageType === 'touchStart' ? 0 : x - oldState.x,
-          dy: messageType === 'touchStart' ? 0 : y - oldState.y
+          x: touch.clientX,
+          y: touch.clientY,
+          dx: messageType === 'touchStart' || !oldState.isTouching ? 0 : x - oldState.x,
+          dy: messageType === 'touchStart' || !oldState.isTouching ? 0 : y - oldState.y,
+          timestamp: Date.now()
         }
-      });
-
+      };
+      this.localFingers[touch.identifier] = newUpdate.state;
+      this.localTouch.next(newUpdate);
     }
   }
 
@@ -104,8 +111,31 @@ export class VirtualGlassComponent implements OnInit {
 
       this.localTouch.next({
         identifier: touch.identifier,
-        state: { isTouching: false, x: 0, y: 0, dx: 0, dy: 0 }
+        state: { isTouching: false, x: 0, y: 0, dx: 0, dy: 0, timestamp: Date.now() }
       });
+    });
+  }
+
+  private detectTouches(observable: Observable<TouchUpdate>, fingers: FingerState[]) {
+    observable.subscribe(update => {
+      const state = update.state;
+      if (state.isTouching) {
+        let finger: FingerState;
+        for (let i = 0; i < fingers.length; ++i) {
+          finger = fingers[i];
+          if (finger.isTouching &&
+            Math.abs(state.x - finger.x + VirtualGlassComponent.FINGER_SIZE / 2) <= VirtualGlassComponent.FINGER_SIZE &&
+            Math.abs(state.y - finger.y + VirtualGlassComponent.FINGER_SIZE / 2) <= VirtualGlassComponent.FINGER_SIZE
+          ) {
+            // const relativeVelocityX = state.dx - finger.dx;
+            // const relativeVelocityY = state.dy - finger.dy;
+            // const relativeVelocity = Math.sqrt(Math.pow(relativeVelocityX, 2) + Math.pow(relativeVelocityY, 2));
+            // console.log(state.dx, state.dy, Math.abs(relativeVelocity));
+            window.navigator.vibrate([10, 10]);
+            break;
+          }
+        }
+      }
     });
   }
 
@@ -113,3 +143,5 @@ export class VirtualGlassComponent implements OnInit {
     return new Array(i);
   }
 }
+
+interface TouchUpdate { identifier: number; state: FingerState; }

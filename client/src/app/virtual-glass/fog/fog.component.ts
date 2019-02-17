@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs';
-import { FingerState } from '../finger-state';
 import { interval } from 'rxjs';
 import { takeUntil, debounceTime, startWith, switchMap, tap, take } from 'rxjs/operators';
+import { SimpleFingerState } from './finger-state';
 
 @Component({
   selector: 'app-fog',
@@ -10,10 +10,10 @@ import { takeUntil, debounceTime, startWith, switchMap, tap, take } from 'rxjs/o
   styleUrls: ['./fog.component.scss']
 })
 export class FogComponent implements OnInit {
-  @Input() touch: Observable<{identifier: number, state: FingerState}>;
+  @Input() touch: Observable<{identifier: number, state: SimpleFingerState}>;
   @ViewChild('canvas') canvasRef: ElementRef;
 
-  private fingers: FingerState[];
+  private fingers: SimpleFingerState[];
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
 

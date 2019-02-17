@@ -1,12 +1,12 @@
 .finger {
-  $diamater: 50px;
-  $radius: $diamater/2;
+  $width: 1.2cm;
+  $height: 1.5cm;
 
   position: absolute;
-  border-radius: $radius;
-  width: $diamater;
-  height: $diamater;
-  margin-top: -$radius;
-  margin-left: -$radius;
+  border-radius: $width/2;
+  width: $width;
+  height: $height;
+  margin-top: -$width/2;
+  margin-left: -$height/2;
   background: black;
 }

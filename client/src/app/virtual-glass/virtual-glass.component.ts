@@ -14,6 +14,7 @@ import { FingerState } from './finger-state';
 export class VirtualGlassComponent implements OnInit {
   private connection: IConnection;
   private fingers: FingerState[];
+  private debugFinger: FingerState = { isTouching: true, x: 50, y: 50 };
 
   constructor(private application: ApplicationService) {
     this.connection = this.application.connection;

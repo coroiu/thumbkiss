@@ -81,7 +81,7 @@ export class VirtualGlassComponent implements OnInit {
       });
 
       this.localTouch.next({
-        identifier: i,
+        identifier: touch.identifier,
         state: { isTouching: true, x, y }
       });
     }

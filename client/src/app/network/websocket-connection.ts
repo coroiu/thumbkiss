@@ -16,8 +16,8 @@ export class WebsocketConnection implements IConnection {
   }
 
   connect(groupId: string) {
-    console.log('connecting');
-    this.socket = new WebSocket(`ws://${location.host}?clientId=${this.id}&groupId=${groupId}`);
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    this.socket = new WebSocket(`${protocol}//${location.host}?clientId=${this.id}&groupId=${groupId}`);
     this.socket.onopen = this.openHandler.bind(this);
     this.socket.onmessage = this.messageHandler.bind(this);
     this.socket.onclose = this.closeHandler.bind(this);

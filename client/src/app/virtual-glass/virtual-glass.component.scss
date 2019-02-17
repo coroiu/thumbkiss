@@ -26,3 +26,8 @@
   @extend .fullscreen;
   background: rgba(255, 255, 255, 0.25);
 }
+
+app-fog {
+  filter: blur(3px);
+  // opacity: 0.5;
+}

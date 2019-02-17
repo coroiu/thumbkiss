@@ -5,6 +5,7 @@ import { TouchMoveMessage, isTouchMoveMessage } from '../network/touch-move-mess
 import { TouchEndMessage, isTouchEndMessage } from '../network/touch-end-message';
 import { TouchStartMessage, isTouchStartMessage } from '../network/touch-start-message';
 import { FingerState } from './finger-state';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-virtual-glass',
@@ -15,35 +16,43 @@ export class VirtualGlassComponent implements OnInit {
   private connection: IConnection;
   private fingers: FingerState[];
   private debugFinger: FingerState = { isTouching: true, x: 50, y: 50 };
+  private localTouch = new Subject<{ identifier: number, state: FingerState }>();
+  private remoteTouch = new Subject<{ identifier: number, state: FingerState }>();
 
   constructor(private application: ApplicationService) {
     this.connection = this.application.connection;
     this.fingers = new Array(10);
     for (let i = 0; i < this.fingers.length; ++i) {
-      this.fingers[i] = { isTouching: false, x: 0, y: 0 };
+      this.fingers[i] = { isTouching: false,  x: 0, y: 0 };
     }
   }
 
   ngOnInit() {
     this.connection.onDataReceived.subscribe(message => {
+      let state: FingerState;
       if (isTouchStartMessage(message)) {
-        this.fingers[message.identifier] = {
+        state = {
           isTouching: true,
           x: message.x,
           y: message.y
         };
       } else if (isTouchMoveMessage(message)) {
-        this.fingers[message.identifier] = {
+        state = {
           isTouching: true,
           x: message.x,
           y: message.y
         };
       } else if (isTouchEndMessage(message)) {
-        this.fingers[message.identifier] = {
+        state = {
           isTouching: false,
           x: 0,
           y: 0
         };
+      }
+
+      if (state !== undefined) {
+        this.fingers[message.identifier] = state;
+        this.remoteTouch.next({ identifier: message.identifier, state });
       }
     });
   }
@@ -68,8 +77,8 @@ export class VirtualGlassComponent implements OnInit {
       this.connection.send<any>({
         type: messageType,
         identifier: touch.identifier,
-        x: (touch.clientX / document.documentElement.clientWidth) * 100,
-        y: (touch.clientY / document.documentElement.clientHeight) * 100
+        x: (touch.clientX / document.documentElement.clientWidth),
+        y: (touch.clientY / document.documentElement.clientHeight)
       });
     }
   }
